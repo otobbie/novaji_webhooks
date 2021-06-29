@@ -202,19 +202,19 @@ class GoxiController extends Controller
                     $value['maritalStatus'] = "";
                     $value['maturitydate'] = date('Y-m-d',strtotime(date("Y-m-d", time()) . " + 365 day"));
                     $value['frequency'] = "monthly";
-                    $value['dob'] = "";
+                    $value['dob'] = date('Y-m-d');
                     $value['amount'] = $getUser->amount;
                     $value['assuredvalue'] = $getUser->assured;
                     $value['agentid'] = $getUser->agentid;
                     $value['agentname'] = $getUser->agentname;
-
+                    $policyno = "";
                     
                     $productList = $this->createCustomer($apikey,$value,$endpoint);
 
                     if($productList->soapBody->CreateSinglePolicyResponse->CreateSinglePolicyResult){
                         $result = $productList->soapBody->CreateSinglePolicyResponse->CreateSinglePolicyResult;
                         $number_array = explode('for ', $result);
-                        $policyno = $number_array[1]; 
+                        $policyno = (string)$number_array[1]; 
                     }
 
 
@@ -243,7 +243,7 @@ class GoxiController extends Controller
                 
                     
                 }else{
-                    return response(['response'=>"Some error occurred", 200]);
+                    return response(['response'=>"Some error occurred", 401]);
                 }
 
                 
