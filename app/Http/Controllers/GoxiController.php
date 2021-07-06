@@ -181,65 +181,66 @@ class GoxiController extends Controller
                 $getUser = $this->getTransactionGoxi($Refrence);
                 
                 if($getUser){
+                    if ($ResponseCode == "00"){
 
-                    $apikey = "F62FEED2-548F-4EC5-909F-3CAAD8039F03";
-                    $endpoint = "http://goxilife.gibsonline.com/webservice/gibs.asmx";
+                        $apikey = "F62FEED2-548F-4EC5-909F-3CAAD8039F03";
+                        $endpoint = "http://goxilife.gibsonline.com/webservice/gibs.asmx";
 
-                    //Api to register customers
-                    $value['ref'] = rand(1000000000,9999999999);
-                    $value['transdate'] = date('Y-m-d');
-                    $value['product_id'] =  $getUser->covercode;
-                    $value['product_name'] =  $getUser->product_name;
-                    $value['clientid'] = $getUser->msisdn;
-                    $value['surname'] = "";
-                    $value['othername'] = "";
-                    $value['address'] = "";
-                    $value['state'] = "";
-                    $value['phonenumber'] = $getUser->msisdn;
-                    $value['email'] = "";
-                    $value['sex'] = "";
-                    $value['maritalStatus'] = "";
-                    $value['maturitydate'] = date('Y-m-d',strtotime(date("Y-m-d", time()) . " + 365 day"));
-                    $value['frequency'] = "monthly";
-                    $value['dob'] = date('Y-m-d');
-                    $value['amount'] = $getUser->amount;
-                    $value['assuredvalue'] = $getUser->assured;
-                    $value['agentid'] = $getUser->agentid;
-                    $value['agentname'] = $getUser->agentname;
-                    $policyno = "";
-                    
-                    $productList = $this->createCustomer($apikey,$value,$endpoint);
+                        //Api to register customers
+                        $value['ref'] = rand(1000000000,9999999999);
+                        $value['transdate'] = date('Y-m-d');
+                        $value['product_id'] =  $getUser->covercode;
+                        $value['product_name'] =  $getUser->product_name;
+                        $value['clientid'] = $getUser->msisdn;
+                        $value['surname'] = "";
+                        $value['othername'] = "";
+                        $value['address'] = "";
+                        $value['state'] = "";
+                        $value['phonenumber'] = $getUser->msisdn;
+                        $value['email'] = "";
+                        $value['sex'] = "";
+                        $value['maritalStatus'] = "";
+                        $value['maturitydate'] = date('Y-m-d',strtotime(date("Y-m-d", time()) . " + 365 day"));
+                        $value['frequency'] = "monthly";
+                        $value['dob'] = date('Y-m-d');
+                        $value['amount'] = $getUser->amount;
+                        $value['assuredvalue'] = $getUser->assured;
+                        $value['agentid'] = $getUser->agentid;
+                        $value['agentname'] = $getUser->agentname;
+                        $policyno = "";
+                        
+                        $productList = $this->createCustomer($apikey,$value,$endpoint);
 
-                    if($productList->soapBody->CreateSinglePolicyResponse->CreateSinglePolicyResult){
-                        $result = $productList->soapBody->CreateSinglePolicyResponse->CreateSinglePolicyResult;
-                        $number_array = explode('for ', $result);
-                        $policyno = (string)$number_array[1]; 
+                        if($productList->soapBody->CreateSinglePolicyResponse->CreateSinglePolicyResult){
+                            $result = $productList->soapBody->CreateSinglePolicyResponse->CreateSinglePolicyResult;
+                            $number_array = explode('for ', $result);
+                            $policyno = (string)$number_array[1]; 
+                        }
+
+
+                        //pay for policy
+                        $value = array(
+                            "docno"=>$getUser->docno,
+                            "policyno"=>$policyno,
+                            "lastname"=>$getUser->lastname,
+                            "firstname"=>$getUser->firstname,
+                            "transdate"=>$getUser->transdate,
+                            "covercode"=>$getUser->covercode,
+                            "address"=>$getUser->address,
+                            "phone"=>$getUser->phone,
+                            "email"=>$getUser->email,
+                            "amount"=>$getUser->amount,
+                            "brokername"=>$getUser->agentname
+                        );
+                        // var_dump($value); exit;
+                        // $helper =  new Helpers;
+                        $results = $this->policyPayment($apikey,$value, $endpoint);
+                        // var_dump($results); exit;
+                        if($results){
+                            $this->updateTransactionGoxi($Refrence);
+                            return response(['response'=>$results, 200]);
+                        }
                     }
-
-
-                    //pay for policy
-                    $value = array(
-                        "docno"=>$getUser->docno,
-                        "policyno"=>$policyno,
-                        "lastname"=>$getUser->lastname,
-                        "firstname"=>$getUser->firstname,
-                        "transdate"=>$getUser->transdate,
-                        "covercode"=>$getUser->covercode,
-                        "address"=>$getUser->address,
-                        "phone"=>$getUser->phone,
-                        "email"=>$getUser->email,
-                        "amount"=>$getUser->amount,
-                        "brokername"=>$getUser->agentname
-                    );
-                    // var_dump($value); exit;
-                    // $helper =  new Helpers;
-                    $results = $this->policyPayment($apikey,$value, $endpoint);
-                    // var_dump($results); exit;
-                    if($results){
-                        $this->updateTransactionGoxi($Refrence);
-                        return response(['response'=>$results, 200]);
-                    }
-                
                     
                 }else{
                     return response(['response'=>"Some error occurred", 401]);

@@ -48,7 +48,7 @@ class Bet1xController extends Controller
             }
             
 
-            if ($ResponseCode == 00){
+            if ($ResponseCode == "00"){
                 // var_dump("here"); exit;
                  //API to send payment request to 1xbet
                 $url = 'https://aux-one.com/api/ussd/deposit/';
