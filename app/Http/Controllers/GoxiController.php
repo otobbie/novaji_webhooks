@@ -227,7 +227,7 @@ class GoxiController extends Controller
                             "transdate"=>$getUser->transdate,
                             "covercode"=>$getUser->covercode,
                             "address"=>$getUser->address,
-                            "phone"=>$getUser->phone,
+                            "phone"=>$getUser->msisdn,
                             "email"=>$getUser->email,
                             "amount"=>$getUser->amount,
                             "brokername"=>$getUser->agentname
