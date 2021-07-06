@@ -38,7 +38,7 @@ class Bet1xController extends Controller
             //     $msisdn = $body->msisdn;
             // }
 
-            $getUser = $this->getTransactionBet($Refrence);
+            $getUser = $this->getTransactionBet($TransactionId);
             // var_dump($getUser); exit;
             if($getUser){
                 $msisdn = $getUser->msisdn;
@@ -64,7 +64,7 @@ class Bet1xController extends Controller
                 if($result){    
                     if($result->success === true){
                         //update status in db
-                        $this->updateTransaction1xbet($Refrence);
+                        $this->updateTransaction1xbet($TransactionId);
                     }        
                     return response(['response'=>$result, 200]);
                 }

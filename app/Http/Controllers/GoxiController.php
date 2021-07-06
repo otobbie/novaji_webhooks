@@ -178,7 +178,7 @@ class GoxiController extends Controller
                 $TransactionId = $body->TransactionId;
                 $dummy = "";
 
-                $getUser = $this->getTransactionGoxi($Refrence);
+                $getUser = $this->getTransactionGoxi($TransactionId);
                 
                 if($getUser){
                     if ($ResponseCode == "00"){
@@ -237,7 +237,7 @@ class GoxiController extends Controller
                         $results = $this->policyPayment($apikey,$value, $endpoint);
                         // var_dump($results); exit;
                         if($results){
-                            $this->updateTransactionGoxi($Refrence);
+                            $this->updateTransactionGoxi($TransactionId);
                             return response(['response'=>$results, 200]);
                         }
                     }
