@@ -168,14 +168,14 @@ class GoxiController extends Controller
         $body = json_decode(@file_get_contents("php://input"));
             // if(isset($_POST['ResponseCode']) && $_POST['Message'] && $_POST['Amount'] && $_POST['TraceId'] && $_POST['PhoneNumber'] && $_POST['Refrence'] && $_POST['InstitutionCode'] && $_POST['TransactionId'] && $_POST['TraceId']){
             if($body){
-                $ResponseCode = $body->responseCode;
-                $Message = $body->responsemessage;
-                $amount = $body->amount;
-                $TraceId = $body->TraceID;
-                $PhoneNumber = $body->customer_mobile;
-                $Refrence = $body->reference;
-                $InstitutionCode = $body->institutionCode;
-                $TransactionId = $body->TransactionID;
+                $ResponseCode = $body->ResponseCode;
+                $Message = $body->Message;
+                $amount = $body->Amount;
+                $TraceId = $body->TraceId;
+                $PhoneNumber = $body->PhoneNumber;
+                $Refrence = $body->Refrence;
+                $InstitutionCode = $body->InstitutionCode;
+                $TransactionId = $body->TransactionId;
                 $dummy = "";
 
                 $getUser = $this->getTransactionGoxi($Refrence);
