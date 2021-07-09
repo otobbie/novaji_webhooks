@@ -192,8 +192,8 @@ class GoxiController extends Controller
                         $value['product_id'] =  $getUser->covercode;
                         $value['product_name'] =  $getUser->product_name;
                         $value['clientid'] = $getUser->msisdn;
-                        $value['surname'] = "";
-                        $value['othername'] = "";
+                        $value['surname'] = $getUser->lastname;
+                        $value['othername'] = $getUser->firstname;
                         $value['address'] = "";
                         $value['state'] = "";
                         $value['phonenumber'] = $getUser->msisdn;
