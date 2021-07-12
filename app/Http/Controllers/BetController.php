@@ -113,6 +113,16 @@ class BetController extends Controller
             $output = curl_exec($handle);
     
             $result = json_decode($output);
+            // var_dump($result->responseBody); 
+            // $responses = $result->responseBody;
+            // $banks = [];
+            // $count = 0;
+            // foreach($responses as $response){
+            //     $banks[$count++] = $response->name;
+            // }
+            // var_dump($banks); 
+            
+            // exit;
             
             $error =  curl_error($handle);
             if($error){
