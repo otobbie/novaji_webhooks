@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+date_default_timezone_set('Africa/Lagos');
+
 class BetController extends Controller
 {
     /**
@@ -32,6 +34,7 @@ class BetController extends Controller
 
     public function topup($bank_name, $amount, $phone, $customer_name, $apikey, $secretkey, $contractcode){
         $acc_num = $this->get_invoice($amount, $phone, $customer_name, $apikey, $secretkey, $contractcode); 
+        // var_dump($acc_num, isset($acc_num['acc_no'])); exit;
         if(isset($acc_num['acc_no'])){
             $details = $this->get_details($bank_name, $amount, $acc_num['acc_no'], $apikey, $secretkey);
             
@@ -51,6 +54,7 @@ class BetController extends Controller
                     'status'=>'success',
                     'customer_name'=> $customer_name,
                     'reference'=>$acc_num['ref'],
+                    'trans_ref'=>$acc_num['trans_ref'],
                     'amount'=>$amount,
                     'phone'=>$phone,
                     'ussdTemplate'=>$details
@@ -149,10 +153,10 @@ class BetController extends Controller
             "invoiceReference"=>$invoice_no,
             "description"=>"Monnify invoice",
             "currencyCode"=>"NGN",
-            "contractCode"=>"$contractcode",
+            "contractCode"=>$contractcode,
             "customerEmail"=>"tech-support@novajii.com",
             "customerName"=>$customer_name,
-            "expiryDate"=> date('Y-m-d h:i:s',time() + 10)
+            "expiryDate"=> date('Y-m-d h:i:s',strtotime("+1 day"))
         ];
     
         $authorization = base64_encode("$apikey:$secretkey");
@@ -174,7 +178,7 @@ class BetController extends Controller
     
         $output = curl_exec($curl);
         $result = json_decode($output);
-        // var_dump($result); exit;
+        // var_dump(date('Y-m-d h:i:s',time() + 120), $result); exit;
     
         $err = curl_error($curl);
         if($err){
@@ -186,7 +190,8 @@ class BetController extends Controller
         if($result->responseCode == 0){
             $response = [
                 'ref' => $invoice_no,
-                'acc_no' => $result->responseBody->accountNumber
+                'acc_no' => $result->responseBody->accountNumber,
+                'trans_ref' => $result->responseBody->transactionReference,
             ];
             return $response;
         }else{
