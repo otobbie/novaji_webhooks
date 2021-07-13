@@ -55,6 +55,7 @@ class BetController extends Controller
                     'customer_name'=> $customer_name,
                     'reference'=>$acc_num['ref'],
                     'trans_ref'=>$acc_num['trans_ref'],
+                    'bank_name'=>$acc_num['bank_name'],
                     'amount'=>$amount,
                     'phone'=>$phone,
                     'ussdTemplate'=>$details
@@ -201,6 +202,7 @@ class BetController extends Controller
             $response = [
                 'ref' => $invoice_no,
                 'acc_no' => $result->responseBody->accountNumber,
+                'bank_name' => $result->responseBody->bankName,
                 'trans_ref' => $result->responseBody->transactionReference,
             ];
             return $response;
