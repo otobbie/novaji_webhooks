@@ -86,7 +86,8 @@ class BetController extends Controller
     
     public function get_details($bank_name, $amount, $Accountnumber, $apikey, $secretkey){
             $handle = curl_init();
-            $url = 'https://sandbox.monnify.com/api/v1/sdk/transactions/banks';
+            $url = 'https://api.monnify.com/api/v1/sdk/transactions/banks';
+            //'https://sandbox.monnify.com/api/v1/sdk/transactions/banks';
     
             $authorization = $this->authenticate($apikey, $secretkey);
             if(isset($authorization->status_code) == 1){
@@ -157,7 +158,7 @@ class BetController extends Controller
     }
     
     public function get_invoice($amount, $phone, $customer_name, $apikey, $secretkey, $contractcode){
-        $url = 'https://sandbox.monnify.com/api/v1/invoice/create';
+        $url = 'https://api.monnify.com/api/v1/invoice/create';
         $invoice_no = rand(1000000000, 9999999999);
         $fields = [
             "amount"=>$amount,
@@ -218,7 +219,7 @@ class BetController extends Controller
     
     public function authenticate($apikey, $secretkey){
         $handle = curl_init();
-        $url = 'https://sandbox.monnify.com/api/v1/auth/login';
+        $url = 'https://api.monnify.com/api/v1/auth/login';
     
         $authorization = base64_encode("$apikey:$secretkey");
     
