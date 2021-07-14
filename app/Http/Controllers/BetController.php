@@ -161,7 +161,7 @@ class BetController extends Controller
         $url = 'https://api.monnify.com/api/v1/invoice/create';
         $invoice_no = rand(1000000000, 9999999999);
         $fields = [
-            "amount"=>$amount,
+            "amount"=>"10",
             "invoiceReference"=>$invoice_no,
             "description"=>"Monnify invoice",
             "currencyCode"=>"NGN",
