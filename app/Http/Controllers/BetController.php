@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Log;
 
 date_default_timezone_set('Africa/Lagos');
 
@@ -19,6 +20,9 @@ class BetController extends Controller
     public function index(){
         $body = json_decode(@file_get_contents("php://input"));   
         if(isset($body)){
+
+            Log::info('Showing user: '.@file_get_contents("php://input"));
+
             $bank_name =$body->bank_name;
             $amount =$body->amount;;
             $phone = $body->phone;
@@ -161,7 +165,7 @@ class BetController extends Controller
         $url = 'https://api.monnify.com/api/v1/invoice/create';
         $invoice_no = rand(1000000000, 9999999999);
         $fields = [
-            "amount"=>"10",
+            "amount"=>$amount,
             "invoiceReference"=>$invoice_no,
             "description"=>"Monnify invoice",
             "currencyCode"=>"NGN",
