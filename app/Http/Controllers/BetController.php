@@ -38,7 +38,7 @@ class BetController extends Controller
         if(isset($acc_num['acc_no'])){
             $details = $this->get_details($bank_name, $amount, $acc_num['acc_no'], $apikey, $secretkey);
             
-            if($details->status_code === 1){
+            if(isset($details->status_code) == 1){
                 $response = [
                     'status_code'=> 1,
                     'status'=>'failed',
