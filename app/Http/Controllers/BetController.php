@@ -21,7 +21,7 @@ class BetController extends Controller
         $body = json_decode(@file_get_contents("php://input"));   
         if(isset($body)){
 
-            Log::info('Showing user: '.@file_get_contents("php://input"));
+            // Log::info('Showing user: '.@file_get_contents("php://input"));
 
             $bank_name =$body->bank_name;
             $amount =$body->amount;;
@@ -194,7 +194,7 @@ class BetController extends Controller
     
         $output = curl_exec($curl);
         $result = json_decode($output);
-        // var_dump(date('Y-m-d h:i:s',time() + 120), $result); exit;
+        // var_dump($result); exit;
     
         $err = curl_error($curl);
         if($err){
