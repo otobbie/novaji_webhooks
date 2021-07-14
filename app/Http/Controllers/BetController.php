@@ -246,7 +246,7 @@ class BetController extends Controller
         }
         curl_close($handle);
     
-        if($result){
+        if($result->responseBody->accessToken){
             $response = $result->responseBody->accessToken;
             return $response;
         }else{
