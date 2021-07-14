@@ -25,7 +25,11 @@ $router->post('/1xbet/api/makedeposit', "Bet1xController@makeDeposit");
 
 $router->post('/goxi/api/makedeposit', "GoxiController@makeDeposit");
 
-$router->post('/1xbet/api/monnify/topup', "BetController@index");
+$router->post('/1xbet/api/monnify/topup', "BetController@index"); 
+
+$router->post('/1xbet/api/updatedb', "BetdbController@update");
+
+$router->post('/1xbet/api/getnumber', "BetdbController@number");
 
 
 
