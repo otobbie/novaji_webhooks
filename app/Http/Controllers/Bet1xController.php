@@ -25,7 +25,7 @@ class Bet1xController extends Controller
         // if(isset($_POST['ResponseCode']) && $_POST['Message'] && $_POST['Amount'] && $_POST['TraceId'] && $_POST['PhoneNumber'] && $_POST['Refrence'] && $_POST['InstitutionCode'] && $_POST['TransactionId'] && $_POST['TraceId']){
         if($body){
 
-            $ResponseCode = $body->ResponseCode;
+            $ResponseCode = $body->PaymentStatus;
             $msisdn = "";
             // $Message = $body->Message;
             $amount = $body->Amount;
