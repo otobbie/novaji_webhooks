@@ -27,18 +27,18 @@ class Bet1xController extends Controller
 
             $ResponseCode = $body->ResponseCode;
             $msisdn = "";
-            $Message = $body->Message;
+            // $Message = $body->Message;
             $amount = $body->Amount;
-            $TraceId = $body->TraceId;
-            $PhoneNumber = $body->PhoneNumber;
-            $Refrence = $body->Refrence;
-            $InstitutionCode = $body->InstitutionCode;
-            $TransactionId = $body->TransactionId;
+            // $TraceId = $body->TraceId;
+            // $PhoneNumber = $body->PhoneNumber;
+            $Reference = $body->Reference;
+            // $InstitutionCode = $body->InstitutionCode;
+            // $TransactionId = $body->TransactionId;
             // if($body->msisdn){
             //     $msisdn = $body->msisdn;
             // }
 
-            $getUser = $this->getTransactionBet($TransactionId);
+            $getUser = $this->getTransactionBet($Reference);
             // var_dump($getUser); exit;
             if($getUser){
                 $msisdn = $getUser->msisdn;
@@ -48,7 +48,7 @@ class Bet1xController extends Controller
             }
             
 
-            if ($ResponseCode == "00"){
+            if ($ResponseCode == "PAID"){
                 // var_dump("here"); exit;
                  //API to send payment request to 1xbet
                 $url = 'https://aux-one.com/api/ussd/deposit/';
@@ -64,7 +64,7 @@ class Bet1xController extends Controller
                 if($result){    
                     if($result->success === true){
                         //update status in db
-                        $this->updateTransaction1xbet($TransactionId);
+                        $this->updateTransaction1xbet($Reference);
                     }        
                     return response(['response'=>$result, 200]);
                 }
