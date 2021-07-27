@@ -327,7 +327,7 @@ class MonnifyController extends Controller
             "currencyCode"=> "NGN",
             "contractCode"=> "$contractcode",
             "customerEmail"=> "tech-support@novajii.com",
-            "bvn"=> "",
+            // "bvn"=> "",
             "customerName"=> "$phone",
             "getAllAvailableBanks"=> false,
             "preferredBanks"=> ["232"]
