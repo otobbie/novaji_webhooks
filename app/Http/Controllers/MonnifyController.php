@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use Log;
+use PDO;
 
 date_default_timezone_set('Africa/Lagos');
 
@@ -15,6 +16,34 @@ class MonnifyController extends Controller
     public function __construct()
     {
         //
+    }
+
+    public function getUsers($phone){
+        $conn  = $this->pdoConn();
+        // var_dump($conn); exit;
+        $stmt = $conn->prepare("SELECT * FROM bet1x_users WHERE msisdn = ? LIMIT 1");
+        // $stmt->bindValue(":ref", $re);
+        $stmt->execute([$phone]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (object)$result;
+
+    }
+
+    public function pdoConn(){
+         $dsn = "mysql:host=152.228.212.181;dbname=novaji_introserve";
+             $dbuser = "novaji_introserve";
+             $dbpass = "Zh7mWr4i0A98L1mX";
+        try {
+            // $conn = new PDO("mysql:host=152.228.212.181;dbname=novaji_introserve", "novaji_introserve", "Zh7mWr4i0A98L1mX");
+            $conn = new PDO($dsn,$dbuser,$dbpass);
+            // set the PDO error mode to exception
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            return $conn;
+          } catch(PDOException $e) {
+            return "Connection failed: " . $e->getMessage();
+          }
     }
 
     public function index(){
@@ -32,14 +61,21 @@ class MonnifyController extends Controller
             $contractcode = $body->contractcode;
             $type = $body->type;
             $merchant = $body->merchant;
+            $user = $this->getUsers($phone);
+            if(isset($user)){
+                if(isset($user->reference)){
+                    $accountReference = $user->reference;
+                }
+                $accountReference = rand(10000000000000, 99999999999999);;
+            }
+            
 
             if($type == "invoice"){
                 return $this->topup($bank_name, $amount, $phone, $customer_name, $apikey, $secretkey, $contractcode);
+            }elseif($type == "reserve"){
+                return $this->reservedAccounts($apikey, $secretkey, $contractcode, $phone, $merchant, $accountReference);
             }
-
-            return $this->reservedAccounts($apikey, $secretkey, $contractcode, $phone, $merchant);
-            
-            
+                     
         }
     }
 
@@ -269,8 +305,7 @@ class MonnifyController extends Controller
         }
     }
 
-    public function reservedAccounts($apikey, $secretkey, $contractcode, $phone, $merchant){
-        $accountReference = $merchant.rand(10000000000000, 99999999999999);
+    public function reservedAccounts($apikey, $secretkey, $contractcode, $phone, $merchant, $accountReference){
 
         $handle = curl_init();
         $url = 'https://api.monnify.com/api/v2/bank-transfer/reserved-accounts';
