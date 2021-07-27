@@ -33,7 +33,8 @@ $router->post('/1xbet/api/updatedb', "BetdbController@update");
 $router->post('/1xbet/api/getnumber', "BetdbController@number");
 
 # Universal
-
 $router->get("/universal/api/{txId}", "UniversalController@home");
+$router->get("/universal/api/newpolicy/{phone}", "UniversalController@newPolicy");
+$router->get("/universal/api/renewpolicy/{phone}", "UniversalController@renewPolicy");
 
 

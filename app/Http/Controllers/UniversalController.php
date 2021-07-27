@@ -28,6 +28,28 @@ class UniversalController extends Controller
         return response($result, 200);
     }
 
+    public function newPolicy($phone)
+    {
+        $conn  = $this->pdoConn();
+        $sql = "SELECT * FROM universal_new_insurance_policy WHERE msisdn = ? LIMIT 1";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$phone]);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return response($result, 200);
+    }
+
+    public function renewPolicy($phone)
+    {
+        $conn  = $this->pdoConn();
+        $sql = "SELECT * FROM universal_renew_insurance_policy WHERE msisdn = ? LIMIT 1";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$phone]);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return response($result, 200);
+    }
+
     public function makeDeposit(){
         $body = json_decode(@file_get_contents("php://input"));
 
