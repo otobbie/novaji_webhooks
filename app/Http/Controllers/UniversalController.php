@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use PDO;
 use mysqli;
 
-class Bet1xController extends Controller
+class UniversalController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -17,8 +17,20 @@ class Bet1xController extends Controller
         //
     }
 
+    public function home($txId)
+    {
+        $conn  = $this->pdoConn();
+        $sql = "SELECT * FROM universal_pre_payment_logs WHERE transcation_id = ? LIMIT 1";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$txId]);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return response($result, 200);
+    }
+
     public function makeDeposit(){
         $body = json_decode(@file_get_contents("php://input"));
+
         // var_dump($body->ResponseCode);
         // die();
 
@@ -188,7 +200,7 @@ class Bet1xController extends Controller
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    
+
             $result = curl_exec($ch);
             // var_dump($result); exit;
             $err = curl_error($ch);
