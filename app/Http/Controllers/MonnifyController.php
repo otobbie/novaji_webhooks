@@ -5,7 +5,7 @@ use Log;
 
 date_default_timezone_set('Africa/Lagos');
 
-class BetController extends Controller
+class MonnifyController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -30,9 +30,16 @@ class BetController extends Controller
             $apikey = $body->apikey;
             $secretkey = $body->secretkey;
             $contractcode = $body->contractcode;
+            $type = $body->type;
+            $merchant = $body->merchant;
 
+            if($type == "invoice"){
+                return $this->topup($bank_name, $amount, $phone, $customer_name, $apikey, $secretkey, $contractcode);
+            }
+
+            return $this->reservedAccounts($apikey, $secretkey, $contractcode, $phone, $merchant);
             
-            return $this->topup($bank_name, $amount, $phone, $customer_name, $apikey, $secretkey, $contractcode);
+            
         }
     }
 
@@ -260,6 +267,55 @@ class BetController extends Controller
             ];
             return json_encode($response);
         }
+    }
+
+    public function reservedAccounts($apikey, $secretkey, $contractcode, $phone, $merchant){
+        $accountReference = $merchant.rand(10000000000000, 99999999999999);
+
+        $handle = curl_init();
+        $url = 'https://api.monnify.com/api/v2/bank-transfer/reserved-accounts';
+    
+        // $authorization = base64_encode("$apikey:$secretkey");
+        $authorization = $this->authenticate($apikey, $secretkey);
+    
+        $headers = [
+            'Accept: application/json',
+            'Content-Type: application/json',
+            'Authorization: Bearer '.$authorization
+        ];
+
+        $fields = [
+            "accountReference"=> "$accountReference",
+            "accountName"=> "$merchant/$phone",
+            "currencyCode"=> "NGN",
+            "contractCode"=> "$contractcode",
+            "customerEmail"=> "tech-support@novajii.com",
+            "bvn"=> "",
+            "customerName"=> "$phone",
+            "getAllAvailableBanks"=> false,
+            "preferredBanks"=> ["232"]
+        ];
+         
+        // Set the url
+        curl_setopt($handle, CURLOPT_URL, $url);
+        curl_setopt($handle, CURLOPT_POST, true);
+        curl_setopt($handle, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($handle, CURLOPT_POSTFIELDS, json_encode($fields));
+        // Set the result output to be a string.
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+    
+         
+        $output = curl_exec($handle);
+    
+        $result = json_decode($output);
+        $error =  curl_error($handle);
+        if($error){
+            return "error: ".$error;
+        }
+        curl_close($handle);
+    
+        return $result;
+
     }
 
 }
