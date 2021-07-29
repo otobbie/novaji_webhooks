@@ -65,10 +65,11 @@ class MonnifyController extends Controller
 
             
             if(isset($user)){
+                $accountReference = rand(10000000000000, 99999999999999);
                 if(isset($user->reference)){
                     $accountReference = $user->reference;
                 }
-                $accountReference = rand(10000000000000, 99999999999999);
+                
                 
             }
             
