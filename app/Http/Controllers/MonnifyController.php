@@ -61,18 +61,9 @@ class MonnifyController extends Controller
             $contractcode = $body->contractcode;
             $type = $body->type;
             $merchant = $body->merchant;
-            $user = $this->getUsers($phone);
 
-            
-            if(isset($user)){
-                $accountReference = rand(10000000000000, 99999999999999);
-                if(isset($user->reference)){
-                    $accountReference = $user->reference;
-                }
-                
-                
-            }
-            
+            $accountReference = rand(10000000000000, 99999999999999);
+
             if($type == "invoice"){
                 return $this->topup($bank_name, $amount, $phone, $customer_name, $apikey, $secretkey, $contractcode);
             }elseif($type == "reserve"){
