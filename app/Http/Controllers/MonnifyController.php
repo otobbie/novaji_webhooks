@@ -21,7 +21,7 @@ class MonnifyController extends Controller
     public function getUsers($phone){
         $conn  = $this->pdoConn();
         // var_dump($conn); exit;
-        $stmt = $conn->prepare("SELECT * FROM bet1x_users WHERE msisdn = ? LIMIT 1");
+        $stmt = $conn->prepare("SELECT * FROM monnify_users WHERE msisdn = ? LIMIT 1");
         // $stmt->bindValue(":ref", $re);
         $stmt->execute([$phone]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);

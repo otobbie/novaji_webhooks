@@ -32,17 +32,18 @@ class Bet1xController extends Controller
             // $TraceId = $body->TraceId;
             // $PhoneNumber = $body->PhoneNumber;
             $Reference = $body->Reference;
+            $account_ref = $body->Account_ref;
             // $InstitutionCode = $body->InstitutionCode;
             // $TransactionId = $body->TransactionId;
             // if($body->msisdn){
             //     $msisdn = $body->msisdn;
             // }
 
-            $getUser = $this->getTransactionBet($Reference);
+            $getUser = $this->getTransactionBet($account_ref);
             // var_dump($getUser); exit;
             if($getUser){
                 $msisdn = $getUser->msisdn;
-                $amount = $getUser->amount;
+                // $amount = $getUser->amount;
             }else{
                 return response(['response'=>"Some error occurred", 200]);
             }
@@ -64,7 +65,7 @@ class Bet1xController extends Controller
                 if($result){
                     if($result->success === true){
                         //update status in db
-                        $this->updateTransaction1xbet($Reference);
+                        $this->updateTransaction1xbet($account_ref);
                     }
                     return response(['response'=>$result, 200]);
                 }
@@ -81,7 +82,7 @@ class Bet1xController extends Controller
 
         $conn  = $this->pdoConn();
         // var_dump($conn); exit;
-        $stmt = $conn->prepare("SELECT * FROM bet1x_transactions WHERE reference = ? LIMIT 1");
+        $stmt = $conn->prepare("SELECT * FROM bet1x_users WHERE reference = ? LIMIT 1");
         // $stmt->bindValue(":ref", $re);
         $stmt->execute([$reference]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
