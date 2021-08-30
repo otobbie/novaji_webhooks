@@ -19,20 +19,20 @@ class Bet1xController extends Controller
 
     public function makeDeposit(){
         $body = json_decode(@file_get_contents("php://input"));
-        // var_dump($body->ResponseCode);
-        // die();
-
+      
+        $this->saveData(json_decode(@file_get_contents("php://input"), true));
+        // var_dump($data); exit;
         // if(isset($_POST['ResponseCode']) && $_POST['Message'] && $_POST['Amount'] && $_POST['TraceId'] && $_POST['PhoneNumber'] && $_POST['Refrence'] && $_POST['InstitutionCode'] && $_POST['TransactionId'] && $_POST['TraceId']){
         if($body){
 
-            $ResponseCode = $body->PaymentStatus;
+            $ResponseCode = $body->paymentStatus;
             $msisdn = "";
             // $Message = $body->Message;
-            $amount = $body->Amount;
+            $amount = $body->amountPaid;
             // $TraceId = $body->TraceId;
             // $PhoneNumber = $body->PhoneNumber;
-            $Reference = $body->Reference;
-            $account_ref = $body->Account_ref;
+            $Reference = $body->transactionReference;
+            $account_ref = $body->product->reference;
             // $InstitutionCode = $body->InstitutionCode;
             // $TransactionId = $body->TransactionId;
             // if($body->msisdn){
@@ -73,6 +73,21 @@ class Bet1xController extends Controller
         }
     }
 
+    public function saveData($data){
+        // var_dump($data); exit;
+        $url = "https://ojtb8cju7x9rtms-adb1.adb.uk-london-1.oraclecloudapps.com/ords/onexbet/api/monnify-webhook";
+        //"https://ore.ng/ords/onexbet/api/monnify-webhook";
+        // https://ojtb8cju7x9rtms-adb1.adb.uk-london-1.oraclecloudapps.com/ords/onexbet/api/monnify-webhook
+        // $hash = Sha256($Username+$Password+$MerchantID+$BatchID+|+Key);  
+        $headers = [
+            'Content-Type: application/json',
+            'Accept: application/json'
+        ]; 
+        
+        $response = $this->callApi2($data, $url, $headers);
+        return $response;
+    }
+
     public function getTransactionBet($reference){
         // $conn  = $this->mysqliConn();
         // $query = "SELECT * FROM bet1x_transactions WHERE 'reference' = $reference";
@@ -82,10 +97,10 @@ class Bet1xController extends Controller
 
         $conn  = $this->pdoConn();
         // var_dump($conn); exit;
-        $stmt = $conn->prepare("SELECT * FROM bet1x_users WHERE reference = ? LIMIT 1");
+        $stmt = $conn->prepare("SELECT * FROM monnify_users WHERE reference = ? LIMIT 1");
         // $stmt->bindValue(":ref", $re);
         $stmt->execute([$reference]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $stmt->fetch(PDO::FETCH_OBJ);
         return (object)$result;
 
     }
@@ -128,6 +143,30 @@ class Bet1xController extends Controller
         $result = $stmt->execute([$reference]);
         return $result;
 
+    }
+
+    public function callApi2(array $params, $url, array $headers = NULL)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        if(!is_null($headers)){
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $result = curl_exec($ch);
+
+        $err = curl_error($ch);
+        if ($err){
+            return $err;
+        }
+        curl_close($ch);
+        if ($result) {
+            $response = json_decode($result);
+            return $response;
+        }
     }
 
     public function callApi($url, $key, $login, $password, $phone, $phone_code, $user_pass = NULL, $betcode = NULL, $sport_id = NULL, $page = NULL, $show_all = NULL, $is_live = NULL, $info = NULL, $match = NULL, $show_desc = NULL, $coupon = NULL, $from = NULL, $to = NULL, $amount = NULL)
