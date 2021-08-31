@@ -29,10 +29,10 @@ class EasyPayController extends Controller
         if (!$result) {
             $msg ="No User Found";
             $code = 404;
-            return response(["message"=>$msg, "statusCode"=>$code], 200);
+            return response(["statusCode"=>$code, "message"=>$msg], 404);
         }
-
-        return response($result, 200);
+        $code = 201;
+        return response(["statusCode"=>$code, "customer"=>$result], 201);
     }
 
     public function createNewCustomer(Request $request)
