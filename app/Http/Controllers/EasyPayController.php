@@ -41,7 +41,7 @@ class EasyPayController extends Controller
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($result) {
             $msg = "This Phone is already registered";
-            return response()->json(["message"=>$msg], 400);
+            return response()->json(["message"=>$msg], 400); 
         }
         $this->validate($request, [
             "name"=>'required',
@@ -80,7 +80,7 @@ class EasyPayController extends Controller
 
         $msg = "Customer Created Successfully";
 
-        return \response(["message"=>$msg,"response"=>$request], 200);
+        return response(["message"=>$msg,"response"=>$request], 200);
     }
 
     public function makeDeposit(){
