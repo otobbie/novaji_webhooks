@@ -26,6 +26,12 @@ class EasyPayController extends Controller
         $stmt->execute([$phone]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        if (!$result) {
+            $msg ="No User Found";
+            $code = 404;
+            return response(["message"=>$msg, "statusCode"=>$code], 200);
+        }
+
         return response($result, 200);
     }
 
