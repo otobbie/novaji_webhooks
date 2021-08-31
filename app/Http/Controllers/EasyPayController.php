@@ -78,9 +78,14 @@ class EasyPayController extends Controller
             "pin"=>$pin
         ]);
 
+        $sql = "SELECT * FROM novajii_easpay_users WHERE phone = ? LIMIT 1";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$request->phone]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
         $msg = "Customer Created Successfully";
 
-        return response(["message"=>$msg,"response"=>json_decode($request->getContent())], 200);
+        return response(["message"=>$msg,"response"=>$result], 200);
     }
 
     public function makeDeposit(){
