@@ -95,77 +95,14 @@ class EasyPayController extends Controller
         return response(["message"=>$msg,"response"=>$result], 200);
     }
 
-    public function makeDeposit(){
-        $body = json_decode(@file_get_contents("php://input"));
-
-        // var_dump($body->ResponseCode);
-        // die();
-
-        // if(isset($_POST['ResponseCode']) && $_POST['Message'] && $_POST['Amount'] && $_POST['TraceId'] && $_POST['PhoneNumber'] && $_POST['Refrence'] && $_POST['InstitutionCode'] && $_POST['TransactionId'] && $_POST['TraceId']){
-        if($body){
-
-            $ResponseCode = $body->PaymentStatus;
-            $msisdn = "";
-            // $Message = $body->Message;
-            $amount = $body->Amount;
-            // $TraceId = $body->TraceId;
-            // $PhoneNumber = $body->PhoneNumber;
-            $Reference = $body->Reference;
-            // $InstitutionCode = $body->InstitutionCode;
-            // $TransactionId = $body->TransactionId;
-            // if($body->msisdn){
-            //     $msisdn = $body->msisdn;
-            // }
-
-            $getUser = $this->getTransactionBet($Reference);
-            // var_dump($getUser); exit;
-            if($getUser){
-                $msisdn = $getUser->msisdn;
-                $amount = $getUser->amount;
-            }else{
-                return response(['response'=>"Some error occurred", 200]);
-            }
-
-
-            if ($ResponseCode == "PAID"){
-                // var_dump("here"); exit;
-                 //API to send payment request to 1xbet
-                $url = 'https://aux-one.com/api/ussd/deposit/';
-                $key = 'hjASWbhdkiqa3w3n32542nNASDda';
-                $login = 'ussd_nigeria_1x';
-                $password = 'GO3zHcAeFySmyUKl';
-                $phone = $msisdn;
-                $phone_code = '234';
-
-                // $helper =  new Helpers;
-                $result = $this->callApi($url, $key, $login, $password, $phone, $phone_code, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,$amount);
-                // var_dump($result);  exit;
-                if($result){
-                    if($result->success === true){
-                        //update status in db
-                        $this->updateTransaction1xbet($Reference);
-                    }
-                    return response(['response'=>$result, 200]);
-                }
-            }
-        }
-    }
-
-    public function getTransactionBet($reference){
-        // $conn  = $this->mysqliConn();
-        // $query = "SELECT * FROM bet1x_transactions WHERE 'reference' = $reference";
-        // $result = $conn -> query($query) -> fetch_assoc();
-        // var_dump($result);
-        // return (object)$result;
-
+    public function fetchUser($phone)
+    {
         $conn  = $this->pdoConn();
-        // var_dump($conn); exit;
-        $stmt = $conn->prepare("SELECT * FROM bet1x_transactions WHERE reference = ? LIMIT 1");
-        // $stmt->bindValue(":ref", $re);
-        $stmt->execute([$reference]);
+        $sql = "SELECT * FROM novajii_easpay_users WHERE phone = ? LIMIT 1";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$phone]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return (object)$result;
-
+        $row = $stmt->rowCount();
     }
 
     public function mysqliConn(){
@@ -195,91 +132,6 @@ class EasyPayController extends Controller
             return "Connection failed: " . $e->getMessage();
           }
     }
-
-    public function updateTransaction1xbet($reference)
-    {
-
-        $conn  = $this->pdoConn();
-        // var_dump($conn); exit;
-        $stmt = $conn->prepare("UPDATE bet1x_transactions SET status = 'Successful' WHERE reference = ?");
-        // $stmt->bindValue(":ref", $re);
-        $result = $stmt->execute([$reference]);
-        return $result;
-
-    }
-
-    public function callApi($url, $key, $login, $password, $phone, $phone_code, $user_pass = NULL, $betcode = NULL, $sport_id = NULL, $page = NULL, $show_all = NULL, $is_live = NULL, $info = NULL, $match = NULL, $show_desc = NULL, $coupon = NULL, $from = NULL, $to = NULL, $amount = NULL)
-        {
-
-            $params = [
-                'login' => $login,
-                'pass' => $password,
-                'phone' => $phone,
-                'phone_code' => $phone_code,
-            ];
-
-            if(!empty($user_pass) || !is_null($user_pass) ){
-                $params['user_pass'] = $user_pass;
-            }
-            if(!empty($betcode) || !is_null($betcode) ){
-                $params['betcode'] = $betcode;
-            }
-            if(!empty($sport_id) || !is_null($sport_id) ){
-                $params['sport_id'] = $sport_id;
-            }
-            if(!empty($page) || !is_null($page) ){
-                $params['page'] = $page;
-            }
-            if(!empty($show_all) || !is_null($show_all) ){
-                $params['show_all'] = $show_all;
-            }
-            if(!empty($is_live) || !is_null($is_live) ){
-                $params['is_live'] = $is_live;
-            }
-            if(!empty($info) || !is_null($info) ){
-                $params['info'] = $info;
-            }
-            if(!empty($match) || !is_null($match) ){
-                $params['match'] = $match;
-            }
-            if(!empty($show_desc) || !is_null($show_desc) ){
-                $params['show_desc'] = $show_desc;
-            }
-            if(!empty($coupon) || !is_null($coupon) ){
-                $params['coupon'] = $coupon;
-            }
-
-            if(!empty($from) || !is_null($from) ){
-                $params['from'] = $from;
-            }
-            if(!empty($to) || !is_null($to) ){
-                $params['show_desc'] = $show_desc;
-            }
-            if(!empty($amount) || !is_null($amount) ){
-                $params['amount'] = $amount;
-            }
-
-            ksort($params);
-            $params['hash'] = base64_encode(hash_hmac('sha1', http_build_query($params), $key));
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-            $result = curl_exec($ch);
-            // var_dump($result); exit;
-            $err = curl_error($ch);
-            if($err){
-                return $err;
-            }
-            curl_close($ch);
-            if ($result) {
-                $response = json_decode($result);
-                return $response;
-            }
-        }
 
 
 }
