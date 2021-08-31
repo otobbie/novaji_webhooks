@@ -25,14 +25,15 @@ class EasyPayController extends Controller
         $stmt = $conn->prepare($sql);
         $stmt->execute([$phone]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $row = $stmt->rowCount();
 
         if (!$result) {
             $msg ="No User Found";
             $code = 404;
-            return response(["statusCode"=>$code, "message"=>$msg], 404);
+            return response(["statusCode"=>$code, "message"=>$msg, "count"=>0], 404);
         }
         $code = 201;
-        return response(["statusCode"=>$code, "customer"=>$result], 201);
+        return response(["statusCode"=>$code, "customer"=>$result, "count"=>$row], 201);
     }
 
     public function createNewCustomer(Request $request)
