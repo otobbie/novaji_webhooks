@@ -26,11 +26,17 @@ class NovajiBulkSMSController extends Controller
         $sender = $request->sender;
         $message = $request->message;
         $phones = $request->phone;
-        
+
         foreach($phones as $ph) {
             $response = Http::get("https://novajii.com/ords/sms/api/sms?username=$username&sender=$sender&password=$password&destination=$ph&message=$message");
         }
         return \response(["message"=> "Sent"]);
+    }
+
+    public function getBalance()
+    {
+        $response = Http::get("http://ngn.rmlconnect.net:8080/CreditCheck/checkcredits?username=NovajiCor&password=tTvywwRO");
+        return $response->body();
     }
 
     public function makeRequest()
