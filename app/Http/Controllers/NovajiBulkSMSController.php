@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use PDO;
 use mysqli;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
-class EasyPayController extends Controller
+class NovajiBulkSMSController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -16,6 +17,32 @@ class EasyPayController extends Controller
     public function __construct()
     {
         //
+    }
+
+    public function send(Request $request)
+    {
+        $username = $request->username;
+        $password = $request->password;
+        $sender = $request->sender;
+        $message = $request->message;
+        $phones = $request->phone;
+
+        foreach($phones as $ph) {
+            $response = Http::get("https://novajii.com/ords/sms/api/sms?username=$username&sender=$sender&password=$password&destination=$ph&message=$message");
+        }
+        return \response(["message"=> "Sent"]);
+    }
+
+    public function getBalance()
+    {
+        $response = Http::get("http://ngn.rmlconnect.net:8080/CreditCheck/checkcredits?username=NovajiCor&password=tTvywwRO");
+        return $response->body();
+    }
+
+    public function makeRequest()
+    {
+        $response = Http::get('https://jsonplaceholder.typicode.com/users');
+        return $response->json();
     }
 
     public function getUserDetails($phone)

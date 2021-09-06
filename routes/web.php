@@ -40,3 +40,10 @@ $router->get("/universal/api/renewpolicy/{phone}", "UniversalController@renewPol
 # EasyPay
 $router->post("/easypay/api/customer/create", "EasyPayController@createNewCustomer");
 $router->get("/easypay/api/customer/{phone}", "EasyPayController@getUserDetails");
+
+# BulkSms Api
+$router->post("/novaji/bulk-sms/send", "NovajiBulkSMSController@send");
+
+$router->get("/test/http/request", "NovajiBulkSMSController@makeRequest");
+
+$router->get("/route-mobile/balance", "NovajiBulkSMSController@getBalance");
