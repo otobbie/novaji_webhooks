@@ -139,6 +139,30 @@ class GoxiController extends Controller
         return $result;
     }
 
+    public function callApi2(array $params, $url, array $headers = NULL)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        if(!is_null($headers)){
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $result = curl_exec($ch);
+
+        $err = curl_error($ch);
+        if ($err){
+            return $err;
+        }
+        curl_close($ch);
+        if ($result) {
+            $response = json_decode($result);
+            return $response;
+        }
+    }
+
     public function policyPayment($apikey,$value, $endpoint){
     
         $string = '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -236,10 +260,24 @@ class GoxiController extends Controller
                         // $helper =  new Helpers;
                         $results = $this->policyPayment($apikey,$value, $endpoint);
                         // var_dump($results); exit;
+                        
+                        $beturl = "https://pcash.ng/ords/pcash/goxi/transactions";
+                        $params = [
+                            "name" => $getUser->lastname." ".$getUser->firstname, 
+                            "msisdn" => $getUser->msisdn, 
+                            "policyno" => $policyno, 
+                            "amount" => $getUser->amount, 
+                            "product_name" => $getUser->product_name, 
+                            "assuredvalue" => $getUser->assured 
+                         ]; 
+
+                        $log = $this->callApi2($params, $beturl);
+
                         if($results){
                             $this->updateTransactionGoxi($TransactionId);
                             return response(['response'=>$results, 200]);
                         }
+
                     }
                     
                 }else{

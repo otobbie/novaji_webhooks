@@ -52,23 +52,55 @@ class Bet1xController extends Controller
             if ($ResponseCode == "PAID"){
                 // var_dump("here"); exit;
                  //API to send payment request to 1xbet
-                $url = 'https://aux-one.com/api/ussd/deposit/';
-                $key = 'hjASWbhdkiqa3w3n32542nNASDda';
-                $login = 'ussd_nigeria_1x';
-                $password = 'GO3zHcAeFySmyUKl';
-                $phone = $msisdn;
-                $phone_code = '234';
 
-                // $helper =  new Helpers;
-                $result = $this->callApi($url, $key, $login, $password, $phone, $phone_code, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,$amount);
-                // var_dump($result);  exit;
-                if($result){
-                    if($result->success === true){
+                // $url = 'https://aux-one.com/api/ussd/deposit/';
+                // $key = 'hjASWbhdkiqa3w3n32542nNASDda';
+                // $login = 'ussd_nigeria_1x';
+                // $password = 'GO3zHcAeFySmyUKl';
+                // $phone = $msisdn;
+                // $phone_code = '234';
+
+                // // $helper =  new Helpers;
+                // $result = $this->callApi($url, $key, $login, $password, $phone, $phone_code, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,$amount);
+                // // var_dump($result);  exit;
+                // if($result){
+                //     if($result->success === true){
+                //         //update status in db
+                //         $this->updateTransaction1xbet($account_ref);
+                //     }
+                //     return response(['response'=>$result, 200]);
+                // }
+
+                $url = "https://aux-one.com/api/ussd/payments/deposit/without-password";
+                $payload = [
+                    "data" => [
+                          "attributes" => [
+                             "login" => "ussd_nigeria_1x", 
+                             "password" => "GO3zHcAeFySmyUKl", 
+                             "phone_code" => 234, 
+                             "phone_number" => $msisdn, 
+                             "amount" => $amount, 
+                             "timestamp" => time()
+                          ] 
+                       ] 
+                 ]; 
+
+                $result = $this->api2($url,$payload);
+                $updateurl = "https://ojtb8cju7x9rtms-adb1.adb.uk-london-1.oraclecloudapps.com/ords/onexbet/update/update";
+                $payload = [
+                    "ref" => $account_ref,
+                    "response" => json_encode($result)
+                ];
+                $update = $this->callApi2($payload, $updateurl);
+                if($result->data){
+                    // if($result->success === true){
                         //update status in db
                         $this->updateTransaction1xbet($account_ref);
-                    }
+                    // }
                     return response(['response'=>$result, 200]);
                 }
+
+
             }
         }
     }
@@ -141,6 +173,39 @@ class Bet1xController extends Controller
         $stmt = $conn->prepare("UPDATE bet1x_transactions SET status = 'Successful' WHERE reference = ?");
         // $stmt->bindValue(":ref", $re);
         $result = $stmt->execute([$reference]);
+        return $result;
+
+    }
+
+    public function api2($requestUrl, $payload){
+
+        $requestHash = 'W+Uz8&IdzGgVS>r>@^ts5I,wh7:K+r`*@XMy6nG23@N6qt,~PSd?n(te=qQr>P!';
+
+        $payloadJson = json_encode($payload);
+
+        $signature = hash_hmac('sha256', $payloadJson, $requestHash);
+
+        $headers = [
+            "request-signature: {$signature}",
+            'Content-Type: application/vnd.api+json',
+            'Accept: application/vnd.api+json',
+        ];
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $requestUrl);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payloadJson);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $result = json_decode(curl_exec($ch));
+
+        $err = curl_error($ch);
+        if ($err){
+            return $err;
+        }
+        curl_close($ch);
         return $result;
 
     }
