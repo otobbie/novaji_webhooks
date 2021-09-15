@@ -42,7 +42,7 @@ class GoxiController extends Controller
         $stmt = $conn->prepare("SELECT * FROM goxi_transactions WHERE reference = ? LIMIT 1");
         // $stmt->bindValue(":ref", $re);
         $stmt->execute([$reference]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $stmt->fetch(PDO::FETCH_OBJ);
         return (object)$result;
 
     }

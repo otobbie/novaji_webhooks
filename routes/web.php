@@ -47,3 +47,6 @@ $router->post("/novaji/bulk-sms/send", "NovajiBulkSMSController@send");
 $router->get("/test/http/request", "NovajiBulkSMSController@makeRequest");
 
 $router->get("/route-mobile/balance", "NovajiBulkSMSController@getBalance");
+
+# 1xbet MI Billing Api
+$router->get("/1xbet/billing", "BillingController@index");
