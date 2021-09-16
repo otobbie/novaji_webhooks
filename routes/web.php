@@ -46,6 +46,8 @@ $router->post("/novaji/bulk-sms/send", "NovajiBulkSMSController@send");
 
 $router->get("/test/http/request", "NovajiBulkSMSController@makeRequest");
 
+$router->get("/route-mobile", "NovajiBulkSMSController@getBalanceRouteMobile");
+
 $router->get("/route-mobile/balance", "NovajiBulkSMSController@getBalance");
 
 # 1xbet MI Billing Api cron
@@ -54,3 +56,4 @@ $router->get("/1xbet/billing", "BillingController@index");
 #1xbet sport list cron
 $router->get("/1xbet/sports", "SportsController@index");
 $router->get("/1xbet/sports/truncate", "SportsController@truncateSports");
+
