@@ -42,7 +42,7 @@ class GoxiController extends Controller
         $stmt = $conn->prepare("SELECT * FROM goxi_transactions WHERE reference = ? LIMIT 1");
         // $stmt->bindValue(":ref", $re);
         $stmt->execute([$reference]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $stmt->fetch(PDO::FETCH_OBJ);
         return (object)$result;
 
     }
@@ -137,6 +137,30 @@ class GoxiController extends Controller
     </soap:Envelope>';
         $result = $this->soapApi($endpoint, $string);
         return $result;
+    }
+
+    public function callApi2(array $params, $url, array $headers = NULL)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        if(!is_null($headers)){
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $result = curl_exec($ch);
+
+        $err = curl_error($ch);
+        if ($err){
+            return $err;
+        }
+        curl_close($ch);
+        if ($result) {
+            $response = json_decode($result);
+            return $response;
+        }
     }
 
     public function policyPayment($apikey,$value, $endpoint){
@@ -236,10 +260,24 @@ class GoxiController extends Controller
                         // $helper =  new Helpers;
                         $results = $this->policyPayment($apikey,$value, $endpoint);
                         // var_dump($results); exit;
+                        
+                        $beturl = "https://pcash.ng/ords/pcash/goxi/transactions";
+                        $params = [
+                            "name" => $getUser->lastname." ".$getUser->firstname, 
+                            "msisdn" => $getUser->msisdn, 
+                            "policyno" => $policyno, 
+                            "amount" => $getUser->amount, 
+                            "product_name" => $getUser->product_name, 
+                            "assuredvalue" => $getUser->assured 
+                         ]; 
+
+                        $log = $this->callApi2($params, $beturl);
+
                         if($results){
                             $this->updateTransactionGoxi($TransactionId);
                             return response(['response'=>$results, 200]);
                         }
+
                     }
                     
                 }else{
