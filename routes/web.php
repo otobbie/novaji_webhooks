@@ -46,4 +46,4 @@ $router->post("/novaji/bulk-sms/send", "NovajiBulkSMSController@send");
 
 $router->get("/test/http/request", "NovajiBulkSMSController@makeRequest");
 
-$router->get("/route-mobile/balance", "NovajiBulkSMSController@getBalance");
+$router->get("/route-mobile", "NovajiBulkSMSController@getBalanceRouteMobile");

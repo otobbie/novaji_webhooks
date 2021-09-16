@@ -33,6 +33,12 @@ class NovajiBulkSMSController extends Controller
         return \response(["message"=> "Sent"]);
     }
 
+    public function getBalanceRouteMobile()
+    {
+        $response = Http::get("http://ngn.rmlconnect.net:8080/CreditCheck/checkcredits?username=NovajiCor&password=tTvywwRO");
+        return $response->body();
+    }
+
     public function getBalance()
     {
         $response = Http::get("http://ngn.rmlconnect.net:8080/CreditCheck/checkcredits?username=NovajiCor&password=tTvywwRO");
