@@ -86,6 +86,8 @@ class BillingController extends Controller
         }
 
         $pool->wait();
+        shell_exec('cd /');
+        shell_exec('sudo rm billing*');
     }
 
     public function logMi($msisdn, $field, $payload)

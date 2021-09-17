@@ -42,6 +42,7 @@ class SportsController extends Controller
 
     public function index(){
         $url = self::BASE.'/api/ussd/sport/';
+        // '/events/top/live/ /api/ussd/sport/';
         
         $phone = '8107282467';
         $phone_code = '234';
@@ -56,13 +57,30 @@ class SportsController extends Controller
             'show_all' => 1
         ];
 
+        // $url = "https://aux-one.com/api/ussd/users/exists";
+        // $payload = [
+        //     "data" => [
+        //           "type" => "TopEvents", 
+        //           "attributes" => [
+        //              "login" => self::LOGIN, 
+        //              "password" => self::PASSWORD 
+        //           ] 
+        //        ] 
+        //  ];
+
+        // $result = $this->api2($url,$payload);
+        // var_dump($result); exit;
+
         $result = $this->callApi($params, $url, self::KEY);
         $matches = $result->description->events;
-        foreach($matches as $match){
-                   
-            $matches = $match[1]." V ".$match[2].". Match code: ".$match[0];
-            //save each to the db
-            $this->addSports($matches);
+        
+        foreach($matches as $key => $match){
+            if($key < 6){
+                $matches = $match[1]." V ".$match[2].". Match code: ".$match[0];
+                //save each to the db
+                $this->addSports($matches);
+            }       
+            
         }
 
     }
@@ -80,6 +98,40 @@ class SportsController extends Controller
         $sql = "TRUNCATE TABLE bet1x_sports";
         $stmt = $conn->prepare($sql);
         return $stmt->execute();
+    }
+
+    public function api2($requestUrl, $payload){
+
+        $requestHash = 'W+Uz8&IdzGgVS>r>@^ts5I,wh7:K+r`*@XMy6nG23@N6qt,~PSd?n(te=qQr>P!';
+
+        $payloadJson = json_encode($payload);
+
+        $signature = hash_hmac('sha256', $payloadJson, $requestHash);
+
+        $headers = [
+            "request-signature: {$signature}",
+            'Content-Type: application/vnd.api+json',
+            'Accept: application/vnd.api+json',
+        ];
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $requestUrl);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payloadJson);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $result = curl_exec($ch);
+        $result = json_decode($result);
+        $err = curl_error($ch);
+        if ($err){
+            return $err;
+        }
+        curl_close($ch);
+        return $result;
+
     }
 
     public function callApi(array $params, $url, $key)
