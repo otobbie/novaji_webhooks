@@ -26,9 +26,14 @@ class NovajiBulkSMSController extends Controller
         $sender = $request->sender;
         $message = $request->message;
         $phones = $request->phone;
+        // return \response(["data"=> $phones]);
+        $url1 ="https://novajii.com/sendsms";
+        $url2 ="https://novajii.com/ords/sms/api/sms";
+        $url3 ="https://novajii.com/api2/sms/send";
 
-        foreach($phones as $ph) {
-            $response = Http::get("https://novajii.com/ords/sms/api/sms?username=$username&sender=$sender&password=$password&destination=$ph&message=$message");
+        foreach($phones as $destination) {
+            $response = Http::get("$url3?username=$username&sender=$sender&password=$password&destination=$destination&message=$message");
+
         }
         return \response(["message"=> "Sent"]);
     }
