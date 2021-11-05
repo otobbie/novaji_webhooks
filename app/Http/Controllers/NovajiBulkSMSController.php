@@ -26,7 +26,8 @@ class NovajiBulkSMSController extends Controller
         $sender = $request->sender;
         $message = $request->message;
         $phones = $request->phone;
-        // return \response(["data"=> $phones]);
+
+        // SMS Endpoint
         $url1 ="https://novajii.com/sendsms";
         $url2 ="https://novajii.com/ords/sms/api/sms";
         $url3 ="https://novajii.com/api2/sms/send";
