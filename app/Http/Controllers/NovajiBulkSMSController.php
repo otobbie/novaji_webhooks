@@ -51,6 +51,23 @@ class NovajiBulkSMSController extends Controller
         return $response->json();
     }
 
+    public function testEnpoint(Request $request)
+    {
+        $response = Http::post('https://ojtb8cju7x9rtms-ajdb1.adb.uk-london-1.oraclecloudapps.com/ords/sms/api/received-payments', [
+            "message" => "Success",
+            "username" => "tony.okafor@universalinsuranceplc.com",
+            "phone_number" => "09154208438",
+            "amount" => 5000,
+            "trace_id" => "30162109013",
+            "reference" => "0415",
+            "payment_type" => "TEST",
+            "status" => "000",
+            "payment_gateway" => "coralpay",
+            "currency" => "NGN"
+         ]);
+        return $response->body();
+    }
+
     public function getUserDetails($phone)
     {
         $conn  = $this->pdoConn();
