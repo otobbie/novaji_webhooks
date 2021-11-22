@@ -27,10 +27,21 @@ class NovajiBulkSMSController extends Controller
         $message = $request->message;
         $phones = $request->phone;
 
-        foreach($phones as $ph) {
-            $response = Http::get("https://novajii.com/ords/sms/api/sms?username=$username&sender=$sender&password=$password&destination=$ph&message=$message");
+        // SMS Endpoint check
+        $url1 ="https://novajii.com/sendsms";
+        $url2 ="https://novajii.com/ords/sms/api/sms";
+        $url3 ="https://novajii.com/api2/sms/send";
+
+        $response = [];
+        foreach($phones as $destination) {
+            $msg = Http::get("$url3?username=$username&sender=$sender&password=$password&destination=$destination&message=$message");
+            $string = $msg->body();
+            $result = explode(":",$string);
+            $success = $result[0];
+            array_push($response, [$destination => $result[1]]);
+
         }
-        return \response(["message"=> "Sent"]);
+        return \response(["message"=> "Sent", "messageId" => $response]);
     }
 
     public function getBalanceRouteMobile()
@@ -49,6 +60,23 @@ class NovajiBulkSMSController extends Controller
     {
         $response = Http::get('https://jsonplaceholder.typicode.com/users');
         return $response->json();
+    }
+
+    public function testEnpoint(Request $request)
+    {
+        $response = Http::post('https://ojtb8cju7x9rtms-ajdb1.adb.uk-london-1.oraclecloudapps.com/ords/sms/api/received-payments', [
+            "message" => "Success",
+            "username" => "tony.okafor@universalinsuranceplc.com",
+            "phone_number" => "09154208438",
+            "amount" => 5000,
+            "trace_id" => "30162109013",
+            "reference" => "0415",
+            "payment_type" => "TEST",
+            "status" => "000",
+            "payment_gateway" => "coralpay",
+            "currency" => "NGN"
+         ]);
+        return $response->body();
     }
 
     public function getUserDetails($phone)
