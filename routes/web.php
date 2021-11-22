@@ -24,6 +24,7 @@ $router->get('/key', function() {
 $router->post('/1xbet/api/makedeposit', "Bet1xController@makeDeposit");
 
 $router->post('/goxi/api/makedeposit', "GoxiController@makeDeposit");
+$router->post('/goxi/api/lapopay', "GoxiController@lapoPayment");
 
 $router->post('/api/monnify/topup', "MonnifyController@index");
 

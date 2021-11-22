@@ -183,7 +183,7 @@ class GoxiController extends Controller
             <AmountPaid>'.$value['amount'].'</AmountPaid>
         </PolicyPayments>
         </soap:Body>
-    </soap:Envelope>';
+        </soap:Envelope>';
         $result = $this->soapApi($endpoint, $string);
         return $result;
     }
@@ -288,7 +288,65 @@ class GoxiController extends Controller
             }
     }
 
-
+    public function lapoPayment(){
+        $body = json_decode(@file_get_contents("php://input"));
+        if($body){
+                $ref = $body->ref;
+                $acctnum = $body->acctnum;
+                $amount = $body->amount;
+                $string = "<soapenv:Envelope
+                xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"
+                xmlns:fcub=\"http://fcubs.ofss.com/service/FCUBSRTService\">
+                <soapenv:Header/>
+                <soapenv:Body>
+                    <fcub:CREATETRANSACTION_FSFS_REQ>
+                        <fcub:FCUBS_HEADER>
+                            <fcub:SOURCE>LAPOUSSD</fcub:SOURCE>
+                            <!--The field value LAPOPYT is fixed, which is create for the requirement-->
+                            <fcub:UBSCOMP>FCUBS</fcub:UBSCOMP>
+                            <fcub:USERID>LAPOUSSD</fcub:USERID>
+                            <!--The field value LAPOPYT is fixed, which is create for the requirement-->
+                            <fcub:BRANCH>900</fcub:BRANCH>
+                            <fcub:SERVICE>FCUBSRTService</fcub:SERVICE>
+                            <!-- Service Name for Financial operations-->
+                            <fcub:OPERATION>CreateTransaction</fcub:OPERATION>
+                            <!-- Operation Code of the operation to be performed-->
+                        </fcub:FCUBS_HEADER>
+                        <fcub:FCUBS_BODY>
+                            <fcub:Transaction-Details>
+                                <fcub:XREF>$ref</fcub:XREF>
+                                <!--Reference Numebr of the transaction -->
+                                <fcub:PRD>ATPA</fcub:PRD>
+                                <!-- The product to be used for the transaction. ATPA is a fixed value-->
+                                <fcub:BRN>900</fcub:BRN>
+                                <!-- The branch code where the transaction is to be initiated-->
+                                <fcub:TXNBRN>179</fcub:TXNBRN>
+                                <!-- The branch code of the transaction debit account-->
+                                <fcub:TXNCCY>NGN</fcub:TXNCCY>
+                                <!-- The currency of the transaction debit account-->
+                                <fcub:TXNACC>$acctnum</fcub:TXNACC>
+                                <!-- The transaction debit account-->
+                                <fcub:OFFSETBRN>164</fcub:OFFSETBRN>
+                                <!-- The branch code of the transaction credit account/offset account-->
+                                <fcub:OFFSETACC>0030483389</fcub:OFFSETACC>
+                                <!-- The transaction credit account/offset account-->
+                                <fcub:OFFSETCCY>NGN</fcub:OFFSETCCY>
+                                <!-- The currency of the transaction credit account/offset account-->
+                                <fcub:OFFSETAMT>$amount</fcub:OFFSETAMT>
+                                <!-- The amount of the transaction-->
+                                <fcub:LCYAMT>$amount</fcub:LCYAMT>
+                                <!-- The amount of the transaction in local currency -->
+                                <fcub:NARRATIVE>Account to account Transfer </fcub:NARRATIVE>
+                                <!-- The narrative to be provided for the transaction-->
+                            </fcub:Transaction-Details>
+                        </fcub:FCUBS_BODY>
+                    </fcub:CREATETRANSACTION_FSFS_REQ>
+                </soapenv:Body>
+            </soapenv:Envelope>";
+                $result = $this->soapApi($endpoint, $string);
+                return response(["request"=>$string,"response"=>$result]);
+        }
+    }
 
 
 }
