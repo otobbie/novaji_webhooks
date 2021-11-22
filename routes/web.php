@@ -45,6 +45,7 @@ $router->get("/easypay/api/customer/{phone}", "EasyPayController@getUserDetails"
 $router->post("/novaji/bulk-sms/send", "NovajiBulkSMSController@send");
 
 $router->get("/test/http/request", "NovajiBulkSMSController@makeRequest");
+$router->get("/test/endpoint", "NovajiBulkSMSController@testEnpoint");
 
 $router->get("/route-mobile", "NovajiBulkSMSController@getBalanceRouteMobile");
 
